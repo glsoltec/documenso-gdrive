@@ -6,7 +6,8 @@ import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { redirect } from 'react-router';
 import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
+import { Trans } from '@lingui/react/macro';
+import { useLingui } from '@lingui/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@documenso/ui/primitives/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@documenso/ui/primitives/table';
 import type { Route } from './+types/settings.contacts';
@@ -27,7 +28,18 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     throw redirect(`/t/${params.teamUrl}`);
   }
 
-  const recipients = await prisma.recipient.findMany({
+  type RecipientWithEnvelope = {
+    id: number;
+    email: string;
+    name: string;
+    phone: string | null;
+    envelope: {
+      title: string;
+      status: string;
+    };
+  };
+
+  const _recipients = await prisma.recipient.findMany({
     where: {
       envelope: {
         teamId: team.id,
@@ -36,21 +48,16 @@ export async function loader({ request, params }: Route.LoaderArgs) {
         not: null,
       },
     },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      phone: true,
+    include: {
       envelope: {
-        select: {
-          title: true,
-          status: true,
-        },
+        select: { title: true, status: true },
       },
     },
-    orderBy: { updatedAt: 'desc' },
+    orderBy: { id: 'desc' },
     take: 100,
   });
+
+  const recipients = _recipients as RecipientWithEnvelope[];
 
   return { recipients };
 }

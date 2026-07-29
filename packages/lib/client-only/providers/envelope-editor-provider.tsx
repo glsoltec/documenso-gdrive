@@ -557,6 +557,7 @@ const mapLocalRecipientsToRecipients = ({
       envelopeId: envelope.id,
       email: recipient.email,
       name: recipient.name,
+      phone: recipient.phone ?? null,
       token: foundRecipient?.token || '',
       documentDeletedAt: foundRecipient?.documentDeletedAt || null,
       expired: foundRecipient?.expired || null,

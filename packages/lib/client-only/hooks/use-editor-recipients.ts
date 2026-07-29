@@ -95,7 +95,7 @@ export const useEditorRecipients = ({ envelope }: EditorRecipientsProps): UseEdi
       formId: String(recipient.id),
       name: recipient.name,
       email: recipient.email,
-      phone: recipient.phone,
+      phone: recipient.phone ?? undefined,
       role: recipient.role,
       signingOrder: isCcRecipient(recipient) ? undefined : (recipient.signingOrder ?? index + 1),
       actionAuth: ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,

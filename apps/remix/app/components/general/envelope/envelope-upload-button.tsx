@@ -183,7 +183,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
         </Tooltip>
       </TooltipProvider>
 
-      <GoogleDrivePicker onFileSelect={onFileDrop} />
+      <GoogleDrivePicker onFileSelect={(file) => onFileDrop([file])} />
     </div>
   );
 };

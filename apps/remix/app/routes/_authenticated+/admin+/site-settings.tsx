@@ -43,7 +43,7 @@ export default function AdminSiteSettingsPage({ loaderData }: Route.ComponentPro
 
         <AdminSiteBannerSection banner={banner} />
 
-        <AdminGoogleDriveSection clientId={googleDriveClientId} apiKey={googleDriveApiKey} />
+        <AdminGoogleDriveSection clientId={googleDriveClientId ?? ''} apiKey={googleDriveApiKey ?? ''} />
 
         <AdminEmailBlocklistSection emailBlocklist={emailBlocklist} />
       </div>

@@ -1,4 +1,3 @@
-import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { env } from '@documenso/lib/utils/env';
 import { Trans } from '@lingui/react/macro';
 import { HardDriveIcon } from 'lucide-react';
@@ -17,10 +16,10 @@ async function uploadToDrive(pdfBlob: Blob, fileName: string) {
   const scope = 'https://www.googleapis.com/auth/drive.file';
 
   return new Promise<void>((resolve, reject) => {
-    const tokenClient = window.google.accounts.oauth2.initTokenClient({
+    const tokenClient = window.google!.accounts.oauth2.initTokenClient({
       client_id: clientId,
       scope,
-      callback: async (response: { access_token: string }) => {
+      callback: async (response: { access_token?: string }) => {
         if (!response.access_token) {
           reject(new Error('No access token'));
           return;
@@ -47,8 +46,7 @@ async function uploadToDrive(pdfBlob: Blob, fileName: string) {
 
           if (uploadRes.ok) {
             const file = await uploadRes.json();
-            const link = `https://drive.google.com/file/d/${file.id}/view`;
-            window.open(link, '_blank');
+            window.open(`https://drive.google.com/file/d/${file.id}/view`, '_blank');
             resolve();
           } else {
             reject(new Error('Upload failed'));
@@ -69,11 +67,6 @@ export const EnvelopeSaveToDriveDialog = ({ envelopeId, envelopeTitle, envelopeI
   const handleSave = useCallback(async () => {
     setLoading(true);
     try {
-      for (const item of envelopeItems) {
-        const blob = await downloadPDF({ envelopeItem: item, token: undefined, version: 'signed' });
-        // downloadPDF currently downloads to file. We need blob directly.
-        // For now we re-fetch via the URL.
-      }
       const item = envelopeItems[0];
       const url = `/api/v2/envelope/item/${item.id}/download?version=signed`;
       const res = await fetch(url);
@@ -82,7 +75,6 @@ export const EnvelopeSaveToDriveDialog = ({ envelopeId, envelopeTitle, envelopeI
       await uploadToDrive(blob, envelopeTitle);
     } catch (err) {
       console.error('Save to Drive failed:', err);
-      alert('Failed to save document to Google Drive.');
     } finally {
       setLoading(false);
     }
