@@ -53,6 +53,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       url: orgUrl,
     },
     select: {
+      id: true,
       name: true,
       organisationClaim: true,
       organisationAuthenticationPortal: {
@@ -84,6 +85,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   }
 
   return {
+    organisationId: organisation.id,
     organisationName: organisation.name,
     orgUrl,
   };
@@ -92,7 +94,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 export default function OrganisationSignIn({ loaderData }: Route.ComponentProps) {
   const [searchParams] = useSearchParams();
 
-  const { organisationName, orgUrl } = loaderData;
+  const { organisationId, organisationName, orgUrl } = loaderData;
 
   const { t } = useLingui();
   const { toast } = useToast();
@@ -155,6 +157,17 @@ export default function OrganisationSignIn({ loaderData }: Route.ComponentProps)
   return (
     <div className="w-screen max-w-lg px-4">
       <div className="z-10 rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background">
+        <div className="mb-6 flex justify-center">
+          <img
+            src={`/api/branding/logo/organisation/${organisationId}`}
+            alt={organisationName}
+            className="h-12 w-auto"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        </div>
+
         <h1 className="font-semibold text-2xl">
           <Trans>Welcome to {organisationName}</Trans>
         </h1>

@@ -9,25 +9,7 @@ import { InboxIcon, MenuIcon, SearchIcon } from 'lucide-react';
 import { type HTMLAttributes, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 
-import { BrandingLogo } from '~/components/general/branding-logo';
-
-const AppLogo = () => {
-  const [useCustomLogo, setUseCustomLogo] = useState(true);
-
-  if (!useCustomLogo) {
-    return <BrandingLogo className="h-6 w-auto" />;
-  }
-
-  return (
-    <img
-      src="/api/branding/logo/app"
-      alt="Logo"
-      className="h-6 w-auto"
-      onError={() => setUseCustomLogo(false)}
-    />
-  );
-};
-
+import { AppLogo } from '~/components/general/app-logo';
 import { AppCommandMenu } from './app-command-menu';
 import { AppNavDesktop } from './app-nav-desktop';
 import { AppNavMobile } from './app-nav-mobile';

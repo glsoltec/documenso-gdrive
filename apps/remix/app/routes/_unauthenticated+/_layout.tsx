@@ -1,5 +1,6 @@
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
 import { Outlet } from 'react-router';
+import { AppLogo } from '~/components/general/app-logo';
 
 export default function Layout() {
   return (
@@ -17,7 +18,10 @@ export default function Layout() {
           />
         </div>
 
-        <div className="relative w-full">
+        <div className="relative flex w-full flex-col items-center">
+          <div className="mb-8">
+            <AppLogo />
+          </div>
           <Outlet />
         </div>
       </div>
