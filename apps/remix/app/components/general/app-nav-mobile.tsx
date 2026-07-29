@@ -7,7 +7,7 @@ import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { ReadStatus } from '@prisma/client';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
@@ -81,7 +81,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>
       <SheetContent className="flex w-full max-w-[350px] flex-col">
         <Link to="/" onClick={handleMenuItemClick}>
-          <img src={LogoImage} alt="Documenso Logo" className="dark:invert" width={170} height={25} />
+          <img src="/api/branding/logo/app" alt="Logo" className="h-6 w-auto dark:invert" onError={(e) => { (e.target as HTMLImageElement).src = LogoImage; }} />
         </Link>
 
         <div className="mt-8 flex w-full flex-col items-start gap-y-4">
