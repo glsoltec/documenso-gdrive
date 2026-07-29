@@ -1,0 +1,11 @@
+FROM documenso/documenso:latest
+
+USER root
+
+COPY packages/prisma/schema.prisma /app/packages/prisma/schema.prisma
+COPY packages/prisma/migrations/ /app/packages/prisma/migrations/
+
+# Regenerar Prisma client
+RUN npx prisma generate --schema /app/packages/prisma/schema.prisma
+
+USER node
