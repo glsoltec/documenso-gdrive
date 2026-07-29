@@ -567,6 +567,7 @@ export const EnvelopeEditorRecipientForm = () => {
         return (
           signer.email !== recipient.email ||
           signer.name !== recipient.name ||
+          signer.phone !== recipient.phone ||
           signer.role !== recipient.role ||
           signer.signingOrder !== recipient.signingOrder ||
           !isDeepEqual(signerActionAuth, recipientActionAuth)
@@ -974,6 +975,43 @@ export const EnvelopeEditorRecipientForm = () => {
                                           }}
                                           loading={isLoading}
                                           maxLength={255}
+                                        />
+                                      </FormControl>
+
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+
+                                <FormField
+                                  control={form.control}
+                                  name={`signers.${index}.phone`}
+                                  render={({ field }) => (
+                                    <FormItem
+                                      className={cn('w-full', {
+                                        'mb-6':
+                                          form.formState.errors.signers?.[index] &&
+                                          !form.formState.errors.signers[index]?.phone,
+                                      })}
+                                    >
+                                      {!showAdvancedSettings && index === 0 && (
+                                        <FormLabel>
+                                          <Trans>Phone</Trans>
+                                        </FormLabel>
+                                      )}
+
+                                      <FormControl>
+                                        <Input
+                                          type="tel"
+                                          placeholder={t`Phone`}
+                                          {...field}
+                                          disabled={
+                                            snapshot.isDragging ||
+                                            isSubmitting ||
+                                            !canRecipientBeModified(signer.id) ||
+                                            isDirectRecipient
+                                          }
+                                          maxLength={20}
                                         />
                                       </FormControl>
 

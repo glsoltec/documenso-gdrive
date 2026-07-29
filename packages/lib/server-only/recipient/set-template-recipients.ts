@@ -141,6 +141,7 @@ export const setTemplateRecipients = async ({ userId, teamId, id, recipients }: 
           update: {
             name: recipient.name,
             email: recipient.email,
+            phone: recipient.phone ?? undefined,
             role: recipient.role,
             signingOrder: recipient.signingOrder,
             envelopeId: envelope.id,
@@ -149,6 +150,7 @@ export const setTemplateRecipients = async ({ userId, teamId, id, recipients }: 
           create: {
             name: recipient.name,
             email: recipient.email,
+            phone: recipient.phone ?? undefined,
             role: recipient.role,
             signingOrder: recipient.signingOrder,
             token: nanoid(),
@@ -212,6 +214,7 @@ type RecipientData = {
   clientId?: string | null;
   email: string;
   name: string;
+  phone?: string | null;
   role: RecipientRole;
   signingOrder?: number | null;
   actionAuth?: TRecipientActionAuthTypes[];

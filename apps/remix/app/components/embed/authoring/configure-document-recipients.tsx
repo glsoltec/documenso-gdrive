@@ -331,6 +331,32 @@ export const ConfigureDocumentRecipients = ({ control, isSubmitting }: Configure
 
                         <FormField
                           control={control}
+                          name={`signers.${index}.phone`}
+                          render={({ field }) => (
+                            <FormItem
+                              className={cn('flex-1', {
+                                'mb-6': errors?.signers?.[index] && !errors?.signers?.[index]?.phone,
+                              })}
+                            >
+                              <FormLabel className="sr-only">
+                                <Trans>Phone</Trans>
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="tel"
+                                  placeholder={_(msg`Phone`)}
+                                  className="w-full"
+                                  {...field}
+                                  disabled={isSubmitting || snapshot.isDragging}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={control}
                           name={`signers.${index}.role`}
                           render={({ field }) => (
                             <FormItem

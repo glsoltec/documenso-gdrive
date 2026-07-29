@@ -5,7 +5,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { BracesIcon, Globe2Icon, GroupIcon, Settings2Icon, SettingsIcon, Users2Icon, WebhookIcon } from 'lucide-react';
+import { BracesIcon, Globe2Icon, GroupIcon, HardDriveIcon, Settings2Icon, SettingsIcon, Users2Icon, WebhookIcon } from 'lucide-react';
 import { Link, NavLink, Outlet, redirect } from 'react-router';
 
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
@@ -91,6 +91,11 @@ export default function TeamsSettingsLayout() {
       path: `/t/${team.url}/settings/webhooks`,
       label: t`Webhooks`,
       icon: WebhookIcon,
+    },
+    {
+      path: `/t/${team.url}/settings/integrations`,
+      label: t`Integrations`,
+      icon: HardDriveIcon,
     },
   ];
 

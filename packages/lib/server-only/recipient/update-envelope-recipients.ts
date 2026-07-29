@@ -24,6 +24,7 @@ export interface UpdateEnvelopeRecipientsOptions {
     id: number;
     email?: string;
     name?: string;
+    phone?: string | null;
     role?: RecipientRole;
     signingOrder?: number | null;
     accessAuth?: TRecipientAccessAuthTypes[];
@@ -147,6 +148,7 @@ export const updateEnvelopeRecipients = async ({
           data: {
             name: mergedRecipient.name,
             email: mergedRecipient.email,
+            phone: mergedRecipient.phone ?? undefined,
             role: mergedRecipient.role,
             signingOrder: mergedRecipient.signingOrder,
             envelopeId: envelope.id,

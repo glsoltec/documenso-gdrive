@@ -21,6 +21,7 @@ export interface CreateEnvelopeRecipientsOptions {
   recipients: {
     email: string;
     name: string;
+    phone?: string | null;
     role: RecipientRole;
     signingOrder?: number | null;
     accessAuth?: TRecipientAccessAuthTypes[];
@@ -111,6 +112,7 @@ export const createEnvelopeRecipients = async ({
             envelopeId: envelope.id,
             name: recipient.name,
             email: recipient.email,
+            phone: recipient.phone,
             role: recipient.role,
             signingOrder: recipient.signingOrder,
             token: nanoid(),
