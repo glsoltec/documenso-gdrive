@@ -19,6 +19,7 @@ import {
   Download,
   Edit,
   FileOutputIcon,
+  HardDriveIcon,
   History,
   Loader,
   MoreHorizontal,
@@ -33,6 +34,7 @@ import { Link, useNavigate } from 'react-router';
 import { EnvelopeDeleteDialog } from '~/components/dialogs/envelope-delete-dialog';
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { EnvelopeDuplicateDialog } from '~/components/dialogs/envelope-duplicate-dialog';
+import { EnvelopeSaveToDriveDialog } from '~/components/dialogs/envelope-save-to-drive-dialog';
 import { EnvelopeRedistributeDialog } from '~/components/dialogs/envelope-redistribute-dialog';
 import { EnvelopeRenameDialog } from '~/components/dialogs/envelope-rename-dialog';
 import { EnvelopeSaveAsTemplateDialog } from '~/components/dialogs/envelope-save-as-template-dialog';
@@ -117,6 +119,10 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
             <Trans>Audit Logs</Trans>
           </Link>
         </DropdownMenuItem>
+
+        {envelope.status === DocumentStatus.COMPLETED && (
+          <EnvelopeSaveToDriveDialog envelopeId={envelope.id} envelopeTitle={envelope.title} envelopeItems={envelope.envelopeItems} />
+        )}
 
         <EnvelopeDuplicateDialog
           envelopeId={envelope.id}

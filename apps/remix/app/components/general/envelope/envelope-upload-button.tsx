@@ -18,6 +18,7 @@ import { useMemo, useState } from 'react';
 import { ErrorCode as DropzoneErrorCode, type FileRejection } from 'react-dropzone';
 import { useNavigate } from 'react-router';
 
+import { GoogleDrivePicker } from '@documenso/ui/components/google/google-drive-picker';
 import { useCurrentTeam } from '~/providers/team';
 import { getUploadErrorMessage } from '~/utils/toast-error-messages';
 
@@ -152,7 +153,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
   };
 
   return (
-    <div className={cn('relative', className)}>
+    <div className={cn('relative flex items-start gap-2', className)}>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -181,6 +182,8 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
           )}
         </Tooltip>
       </TooltipProvider>
+
+      <GoogleDrivePicker onFileSelect={onFileDrop} />
     </div>
   );
 };
