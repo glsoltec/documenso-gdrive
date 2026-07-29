@@ -12,14 +12,14 @@ import { Button } from "@documenso/ui/primitives/button";
 import type { Route } from "./+types/settings.integrations";
 
 export function meta() {
-  return appMetaTags(msg\`Integrations\`);
+  return appMetaTags(msg`Integrations`);
 }
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request);
   const team = await getTeamByUrl({ userId: session.user.id, teamUrl: params.teamUrl });
   if (!team || !canExecuteTeamAction("MANAGE_TEAM", team.currentTeamRole)) {
-    throw redirect(\`/t/\\${params.teamUrl}\`);
+    throw redirect(`/t/\\${params.teamUrl}`);
   }
   const googleDriveClientId = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_CLIENT_ID || "";
   const evolutionApiUrl = process.env.EVOLUTION_API_URL || "";
@@ -32,7 +32,7 @@ export default function IntegrationsPage({ loaderData }: Route.ComponentProps) {
   const { googleDriveConfigured, evolutionConfigured } = loaderData;
   return (
     <div>
-      <SettingsHeader title={_(msg\`Integrations\`)} subtitle={_(msg\`Manage your third-party integrations.\`)} />
+      <SettingsHeader title={_(msg`Integrations`)} subtitle={_(msg`Manage your third-party integrations.`)} />
       <div className="mt-8 grid gap-6">
         <Card>
           <CardHeader>
@@ -41,8 +41,8 @@ export default function IntegrationsPage({ loaderData }: Route.ComponentProps) {
           </CardHeader>
           <CardContent className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className={\`inline-block h-3 w-3 rounded-full \\${googleDriveConfigured ? "bg-green-500" : "bg-red-500"}\`} />
-              <span className="text-sm">{googleDriveConfigured ? _(msg\`Configured\`) : _(msg\`Not configured\`)}</span>
+              <span className={`inline-block h-3 w-3 rounded-full \\${googleDriveConfigured ? "bg-green-500" : "bg-red-500"}`} />
+              <span className="text-sm">{googleDriveConfigured ? _(msg`Configured`) : _(msg`Not configured`)}</span>
             </div>
             <Button variant="outline" disabled><Trans>Settings</Trans></Button>
           </CardContent>
@@ -54,8 +54,8 @@ export default function IntegrationsPage({ loaderData }: Route.ComponentProps) {
           </CardHeader>
           <CardContent className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className={\`inline-block h-3 w-3 rounded-full \\${evolutionConfigured ? "bg-green-500" : "bg-red-500"}\`} />
-              <span className="text-sm">{evolutionConfigured ? _(msg\`Connected\`) : _(msg\`Not configured\`)}</span>
+              <span className={`inline-block h-3 w-3 rounded-full \\${evolutionConfigured ? "bg-green-500" : "bg-red-500"}`} />
+              <span className="text-sm">{evolutionConfigured ? _(msg`Connected`) : _(msg`Not configured`)}</span>
             </div>
             <Button variant="outline" disabled><Trans>Settings</Trans></Button>
           </CardContent>
