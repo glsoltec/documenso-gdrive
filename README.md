@@ -20,8 +20,11 @@ Fork do [Documenso](https://github.com/documenso/documenso) com customizações 
 - **Campo `phone`**: Adicionado ao modelo `Recipient` no Prisma
 - **Editor de envelope**: Campo "Phone" ao adicionar destinatário
 - **Embed**: Phone field disponível no embed público
-- **Contatos**: Página `/t/:teamUrl/settings/contacts` listando recipients com telefone
-- **Evolution API**: Preparado para envio automático de notificações WhatsApp
+- **Autocomplete**: Ao digitar destinatário, sugestões combinam recipients anteriores, membros do time e contatos — e preenchem automaticamente nome, e-mail e **telefone** ao selecionar
+- **Contatos (CRUD)**: Modelo `Contact` (unique `teamId + email`), página `/t/:teamUrl/settings/contacts` com listagem, criar, editar e excluir
+- **Envio manual de WhatsApp**: Botão no contato dispara mensagem de teste via Evolution API
+- **Sync automático**: Ao enviar um documento, recipients com telefone são sincronizados para a lista de contatos do time (`syncRecipientContact` via upsert)
+- **Notificações automáticas Evolution API**: `sendWhatsAppTextToPhone` envia avisos de envio, conclusão, assinatura e rejeição de documentos
 
 ### 4. Página de Integrações
 - **Rota**: `/t/:teamUrl/settings/integrations`
@@ -34,6 +37,10 @@ Fork do [Documenso](https://github.com/documenso/documenso) com customizações 
 ### 6. Logo da Organização no Login
 - **Org Signin**: `/o/:orgUrl/signin` exibe o branding logo da organização
 - Layout público mostra logo configurada via site settings
+
+### 7. Certificado Digital (ICP-Brasil A1)
+- **Carregamento**: Certificado de assinatura via `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` (base64) ou `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`
+- **Correção de placeholder**: O libpdf reserva por padrão **12.288 bytes** no `/Contents` da assinatura — insuficiente para certificados ICP-Brasil (chain de 4 certs). Agora `NEXT_PRIVATE_SIGNING_ESTIMATED_SIZE` (ex.: `32768`) é lido e passado a `pdf.sign()`, evitando o erro `PlaceholderError` em certificados com chain grande
 
 ## Infraestrutura
 
@@ -64,6 +71,13 @@ GOOGLE_DRIVE_UPLOAD_FOLDER_ID=
 EVOLUTION_API_URL=
 EVOLUTION_INSTANCE_NAME=
 EVOLUTION_API_KEY=
+
+# Assinatura (certificado local)
+NEXT_PRIVATE_SIGNING_TRANSPORT=local
+NEXT_PRIVATE_SIGNING_PASSPHRASE=
+NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
+# Tamanho do placeholder da assinatura em bytes (certificados ICP-Brasil precisam de mais que o padrão 12288)
+NEXT_PRIVATE_SIGNING_ESTIMATED_SIZE=32768
 ```
 
 ## Changelog
