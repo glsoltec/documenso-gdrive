@@ -2,6 +2,7 @@ import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { match } from 'ts-pattern';
 
+import { encryptDocumentData } from './document-encryption';
 import { getAbsolutePresignPostUrl } from './server-actions';
 
 export type UpdateFileOptions = {
@@ -34,7 +35,7 @@ const updateFileWithBytes64 = (data: string) => {
 
   return {
     type: DocumentDataType.BYTES_64,
-    data: asciiData,
+    data: encryptDocumentData(asciiData),
   };
 };
 

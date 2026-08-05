@@ -43,11 +43,14 @@ ENV HUSKY 0
 ENV DOCKER_OUTPUT 1
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Encryption keys
-ARG NEXT_PRIVATE_ENCRYPTION_KEY="CAFEBABE"
+# Encryption keys — MUST be provided at build time via --build-arg.
+# No insecure defaults: the app asserts strong keys at startup (see
+# packages/lib/constants/crypto.ts) and refuses to boot in production
+# with missing/weak values.
+ARG NEXT_PRIVATE_ENCRYPTION_KEY=""
 ENV NEXT_PRIVATE_ENCRYPTION_KEY="$NEXT_PRIVATE_ENCRYPTION_KEY"
 
-ARG NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="DEADBEEF"
+ARG NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=""
 ENV NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="$NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY"
 
 # Telemetry credentials (optional, baked into image at build time)

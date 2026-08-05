@@ -2,6 +2,7 @@ import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { match } from 'ts-pattern';
 
+import { decryptDocumentData } from './document-encryption';
 import { getPresignGetUrl } from './server-actions';
 
 export type GetFileOptions = {
@@ -26,7 +27,9 @@ const getFileFromBytes = (data: string) => {
 };
 
 const getFileFromBytes64 = (data: string) => {
-  const binaryData = base64.decode(data);
+  // Transparently decrypt records that were encrypted at-rest. The version
+  // prefix allows mixing legacy (plain) and encrypted documents.
+  const binaryData = base64.decode(decryptDocumentData(data));
 
   return binaryData;
 };

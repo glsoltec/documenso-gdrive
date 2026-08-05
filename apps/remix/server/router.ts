@@ -1,6 +1,7 @@
 import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
 import { csc } from '@documenso/ee/server-only/signing/csc/hono';
+import { assertStrongEncryptionKeys } from '@documenso/lib/constants/crypto';
 import { jobsClient } from '@documenso/lib/jobs/client';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import { createRateLimitMiddleware } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
@@ -47,6 +48,9 @@ export interface HonoEnv {
 }
 
 const app = new Hono<HonoEnv>();
+
+// Fail fast at startup if weak/missing encryption keys are configured (LGPD art. 46-49).
+assertStrongEncryptionKeys();
 
 /**
  * Database-backed rate limiting for API routes.

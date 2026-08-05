@@ -7,6 +7,7 @@ import { match } from 'ts-pattern';
 import { AppError } from '../../errors/app-error';
 import { createDocumentData } from '../../server-only/document-data/create-document-data';
 import { normalizePdf } from '../../server-only/pdf/normalize-pdf';
+import { encryptDocumentData } from './document-encryption';
 import { uploadS3File } from './server-actions';
 
 type File = {
@@ -89,9 +90,10 @@ const putFileInDatabase = async (file: File) => {
 
   const asciiData = base64.encode(binaryData);
 
+  // LGPD art. 46: encrypt at-rest document contents when enabled.
   return {
     type: DocumentDataType.BYTES_64,
-    data: asciiData,
+    data: encryptDocumentData(asciiData),
   };
 };
 
