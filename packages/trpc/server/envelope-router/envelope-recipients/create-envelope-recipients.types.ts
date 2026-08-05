@@ -18,6 +18,7 @@ export const createEnvelopeRecipientsMeta: TrpcRouteMeta = {
 export const ZCreateEnvelopeRecipientSchema = z.object({
   email: ZRecipientEmailSchema,
   name: z.string().max(255),
+  phone: z.string().max(20).optional(),
   role: z.nativeEnum(RecipientRole),
   signingOrder: z.number().optional(),
   accessAuth: z.array(ZRecipientAccessAuthTypesSchema).default([]).optional(),

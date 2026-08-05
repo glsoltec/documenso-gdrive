@@ -41,6 +41,7 @@ export const getRecipientSuggestions = async ({ userId, teamId, query }: GetReci
     select: {
       name: true,
       email: true,
+      phone: true,
       envelope: {
         select: {
           createdAt: true,
@@ -55,6 +56,26 @@ export const getRecipientSuggestions = async ({ userId, teamId, query }: GetReci
     },
     take: 5,
   });
+
+  const contacts = await prisma.contact.findMany({
+    where: {
+      teamId,
+      ...nameEmailFilter,
+    },
+    select: { name: true, email: true, phone: true },
+    orderBy: { createdAt: 'desc' },
+    take: 5,
+  });
+
+  const mergeContacts = (
+    suggestions: { name: string | null; email: string; phone: string | null }[],
+  ) => {
+    const existingEmails = new Set(suggestions.map((suggestion) => suggestion.email.toLowerCase()));
+
+    const newContacts = contacts.filter((contact) => !existingEmails.has(contact.email.toLowerCase()));
+
+    return [...suggestions, ...newContacts].slice(0, 8);
+  };
 
   if (teamId) {
     const teamMembers = await prisma.organisationMember.findMany({
@@ -90,13 +111,14 @@ export const getRecipientSuggestions = async ({ userId, teamId, query }: GetReci
       const teamMemberSuggestion = {
         email: uniqueTeamMember.user.email,
         name: uniqueTeamMember.user.name,
+        phone: null,
       };
 
       const allSuggestions = [...recipients.slice(0, 4), teamMemberSuggestion];
 
-      return allSuggestions;
+      return mergeContacts(allSuggestions);
     }
   }
 
-  return recipients;
+  return mergeContacts(recipients);
 };

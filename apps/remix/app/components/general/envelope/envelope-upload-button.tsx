@@ -18,8 +18,8 @@ import { useMemo, useState } from 'react';
 import { ErrorCode as DropzoneErrorCode, type FileRejection } from 'react-dropzone';
 import { useNavigate } from 'react-router';
 
-import { GoogleDrivePicker } from '@documenso/ui/components/google/google-drive-picker';
 import { useCurrentTeam } from '~/providers/team';
+import { GoogleDrivePicker } from "@documenso/ui/components/google/google-drive-picker";
 import { getUploadErrorMessage } from '~/utils/toast-error-messages';
 
 export type EnvelopeUploadButtonProps = {
@@ -182,7 +182,6 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
           )}
         </Tooltip>
       </TooltipProvider>
-
       <GoogleDrivePicker onFileSelect={(file) => onFileDrop([file])} />
     </div>
   );

@@ -57,7 +57,7 @@ import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { getOrganisationTemplateWhereInput } from './get-organisation-template-by-id';
 
-type FinalRecipient = Pick<Recipient, 'name' | 'email' | 'role' | 'authOptions' | 'signingOrder' | 'token'> & {
+type FinalRecipient = Pick<Recipient, 'name' | 'email' | 'phone' | 'role' | 'authOptions' | 'signingOrder' | 'token'> & {
   templateRecipientId: number;
   fields: Field[];
 };
@@ -71,6 +71,7 @@ export type CreateDocumentFromTemplateOptions = {
     id: number;
     name?: string;
     email: string;
+    phone?: string;
     signingOrder?: number | null;
   }[];
   folderId?: string;
@@ -401,6 +402,7 @@ export const createDocumentFromTemplate = async ({
       fields: templateRecipient.fields,
       name: foundRecipient ? (foundRecipient.name ?? '') : templateRecipient.name,
       email: foundRecipient ? foundRecipient.email : templateRecipient.email,
+      phone: foundRecipient ? (foundRecipient.phone ?? null) : null,
       role: templateRecipient.role,
       signingOrder: foundRecipient?.signingOrder ?? templateRecipient.signingOrder,
       authOptions: templateRecipient.authOptions,
@@ -420,6 +422,7 @@ export const createDocumentFromTemplate = async ({
       fields: [],
       name: recipient.name || recipient.email,
       email: recipient.email,
+      phone: null,
       role: recipient.role,
       signingOrder: null,
       authOptions: createRecipientAuthOptions({
@@ -584,6 +587,7 @@ export const createDocumentFromTemplate = async ({
               return {
                 email: recipient.email,
                 name: recipient.name,
+                phone: recipient.phone,
                 role: recipient.role,
                 authOptions: createRecipientAuthOptions({
                   accessAuth: authOptions.accessAuth,

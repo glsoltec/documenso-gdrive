@@ -366,6 +366,10 @@ export const EnvelopeEditorRecipientForm = () => {
       shouldValidate: true,
       shouldDirty: true,
     });
+    setValue(`signers.${index}.phone`, suggestion.phone ?? '', {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
   };
 
   const onDragEnd = useCallback(

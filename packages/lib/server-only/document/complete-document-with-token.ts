@@ -28,6 +28,7 @@ import { mapSecondaryIdToDocumentId, unsafeBuildEnvelopeIdQuery } from '../../ut
 import { assertRecipientNotExpired } from '../../utils/recipients';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+import { sendRecipientSigned, sendDocumentCompleted } from '../whatsapp/send-whatsapp';
 import { isRecipientAuthorized } from './is-recipient-authorized';
 
 export type CompleteDocumentWithTokenOptions = {
@@ -357,6 +358,8 @@ export const completeDocumentWithToken = async ({
     teamId: envelope.teamId,
   });
 
+  await sendRecipientSigned(envelope.title, recipientEmail, recipientName);
+
   await jobs.triggerJob({
     name: 'send.recipient.signed.email',
     payload: {
@@ -497,4 +500,11 @@ export const completeDocumentWithToken = async ({
     userId: updatedDocument.userId,
     teamId: updatedDocument.teamId ?? undefined,
   });
+
+  await sendDocumentCompleted(
+    updatedDocument.title,
+    updatedDocument.recipients
+      .filter((r) => r.role !== RecipientRole.CC)
+      .map((r) => ({ email: r.email, name: r.name })),
+  );
 };

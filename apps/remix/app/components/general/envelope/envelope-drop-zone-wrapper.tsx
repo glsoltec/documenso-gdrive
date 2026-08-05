@@ -21,7 +21,6 @@ import { type ReactNode, useState } from 'react';
 import { ErrorCode as DropzoneErrorCode, type FileRejection, useDropzone } from 'react-dropzone';
 import { Link, useNavigate, useParams } from 'react-router';
 
-import { GoogleDrivePicker } from '@documenso/ui/components/google/google-drive-picker';
 import { useCurrentTeam } from '~/providers/team';
 import { getUploadErrorMessage } from '~/utils/toast-error-messages';
 
@@ -166,9 +165,6 @@ export const EnvelopeDropZoneWrapper = ({ children, type, className }: EnvelopeD
   return (
     <div {...getRootProps()} className={cn('relative min-h-screen', className)}>
       <input {...getInputProps()} />
-      <div className="mb-4 flex items-center gap-2">
-        <GoogleDrivePicker onFileSelect={(file) => void onFileDrop([file])} />
-      </div>
       {children}
 
       {isDragActive && (

@@ -55,6 +55,7 @@ const ZAddRecipientsForNewDocumentSchema = z.object({
       id: z.number(),
       email: ZRecipientEmailSchema,
       name: z.string(),
+      phone: z.string().max(20).optional(),
       signingOrder: z.number().optional(),
     }),
   ),
@@ -122,6 +123,7 @@ export function TemplateUseDialog({
             id: recipient.id,
             name: !isRecipientNamePlaceholder ? recipient.name : '',
             email: !isRecipientEmailPlaceholder ? recipient.email : '',
+            phone: '',
             signingOrder: recipient.signingOrder ?? undefined,
           };
         }),
@@ -302,6 +304,31 @@ export function TemplateUseDialog({
                               {...field}
                               aria-label="Name"
                               placeholder={recipients[index].name || _(msg`Recipient ${index + 1}`)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name={`recipients.${index}.phone`}
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          {index === 0 && (
+                            <FormLabel>
+                              <Trans>Phone</Trans>
+                            </FormLabel>
+                          )}
+
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="tel"
+                              aria-label="Phone"
+                              placeholder={_(msg`Phone`)}
+                              maxLength={20}
                             />
                           </FormControl>
                           <FormMessage />

@@ -204,3 +204,17 @@ export const ZRejectDocumentWithTokenMutationSchema = z.object({
 });
 
 export type TRejectDocumentWithTokenMutationSchema = z.infer<typeof ZRejectDocumentWithTokenMutationSchema>;
+
+export const ZUpdateRecipientContactRequestSchema = z.object({
+  recipientId: z.number(),
+  name: z.string().max(255).optional(),
+  email: zEmail().toLowerCase().max(254).optional(),
+  phone: z.string().max(20).nullable().optional(),
+});
+
+export const ZUpdateRecipientContactResponseSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  email: z.string(),
+  phone: z.string().nullable(),
+});

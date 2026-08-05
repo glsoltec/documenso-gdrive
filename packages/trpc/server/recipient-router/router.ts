@@ -6,6 +6,7 @@ import { deleteEnvelopeRecipient } from '@documenso/lib/server-only/recipient/de
 import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recipient-by-id';
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
 import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
+import { updateRecipientContact } from '@documenso/lib/server-only/recipient/update-recipient-contact';
 import { updateEnvelopeRecipients } from '@documenso/lib/server-only/recipient/update-envelope-recipients';
 import { isTspEnvelope } from '@documenso/lib/types/signature-level';
 import { unsafeBuildEnvelopeIdQuery } from '@documenso/lib/utils/envelope';
@@ -39,6 +40,8 @@ import {
   ZUpdateDocumentRecipientResponseSchema,
   ZUpdateDocumentRecipientsRequestSchema,
   ZUpdateDocumentRecipientsResponseSchema,
+  ZUpdateRecipientContactRequestSchema,
+  ZUpdateRecipientContactResponseSchema,
   ZUpdateTemplateRecipientRequestSchema,
   ZUpdateTemplateRecipientResponseSchema,
   ZUpdateTemplateRecipientsRequestSchema,
@@ -280,6 +283,30 @@ export const recipientRouter = router({
       });
 
       return ZGenericSuccessResponse;
+    }),
+
+  /**
+   * @private
+   */
+  updateContact: authenticatedProcedure
+    .input(ZUpdateRecipientContactRequestSchema)
+    .output(ZUpdateRecipientContactResponseSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+      const { recipientId, ...data } = input;
+
+      ctx.logger.info({
+        input: {
+          recipientId,
+        },
+      });
+
+      return await updateRecipientContact({
+        userId: ctx.user.id,
+        teamId,
+        recipientId,
+        ...data,
+      });
     }),
 
   /**

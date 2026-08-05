@@ -1056,6 +1056,7 @@ model Team {
   apiTokens  ApiToken[]
   webhooks   Webhook[]
   teamGroups TeamGroup[]
+  contacts   Contact[]
 
   organisationId String
   organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
@@ -1273,4 +1274,20 @@ model RateLimit {
 
   @@id([key, action, bucket])
   @@index([createdAt])
+}
+
+model Contact {
+  id        Int      @id @default(autoincrement())
+  email     String   @db.VarChar(254)
+  name      String   @db.VarChar(255)
+  phone     String?  @db.VarChar(20)
+  teamId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, email])
+  @@index([teamId])
+  @@map("Contact")
 }

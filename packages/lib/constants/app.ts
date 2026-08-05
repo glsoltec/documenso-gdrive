@@ -36,6 +36,18 @@ export const NEXT_PRIVATE_USE_PLAYWRIGHT_PDF = () => env('NEXT_PRIVATE_USE_PLAYW
 
 export const NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY = () => env('NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY');
 
+export const NEXT_PRIVATE_SIGNING_ESTIMATED_SIZE = () => {
+  const value = env('NEXT_PRIVATE_SIGNING_ESTIMATED_SIZE');
+
+  if (!value) {
+    return undefined;
+  }
+
+  const parsed = Number(value);
+
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+};
+
 /**
  * Whether this Documenso instance is running in CSC (Cloud Signature Consortium) mode.
  *

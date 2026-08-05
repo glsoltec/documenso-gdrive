@@ -43,6 +43,8 @@ import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { assertUserNotDisabledById } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+import { syncRecipientsToContacts } from '../contacts/sync-recipient-contact';
+import { sendDocumentSent } from '../whatsapp/send-whatsapp';
 
 export type SendDocumentOptions = {
   id: EnvelopeIdOptions;
@@ -364,6 +366,23 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(updatedEnvelope)),
     userId,
     teamId,
+  });
+
+  await sendDocumentSent(
+    updatedEnvelope.title,
+    process.env.NEXT_PUBLIC_WEBAPP_URL || 'https://docsign.glsoltec.com.br',
+    updatedEnvelope.recipients
+      .filter((r) => r.role !== RecipientRole.CC)
+      .map((r) => ({ email: r.email, name: r.name, token: r.token })),
+  );
+
+  await syncRecipientsToContacts({
+    teamId,
+    recipients: updatedEnvelope.recipients.map((r) => ({
+      email: r.email,
+      name: r.name ?? '',
+      phone: r.phone ?? null,
+    })),
   });
 
   return updatedEnvelope;

@@ -10,6 +10,7 @@ export const ZGetRecipientSuggestionsResponseSchema = z.object({
     z.object({
       name: z.string().nullable(),
       email: z.union([zEmail(), z.literal('')]),
+      phone: z.string().nullable(),
     }),
   ),
 });

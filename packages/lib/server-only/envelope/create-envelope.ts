@@ -56,6 +56,7 @@ type CreateEnvelopeRecipientFieldOptions = TFieldAndMeta & {
 type CreateEnvelopeRecipientOptions = {
   email: string;
   name: string;
+  phone?: string | null;
   role: RecipientRole;
   signingOrder?: number;
   accessAuth?: TRecipientAccessAuthTypes[];
@@ -460,6 +461,7 @@ export const createEnvelope = async ({
             envelopeId: envelope.id,
             name: recipient.name,
             email: recipient.email,
+            phone: recipient.phone,
             role: recipient.role,
             signingOrder: recipient.signingOrder,
             token: nanoid(),

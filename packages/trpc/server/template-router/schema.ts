@@ -94,6 +94,7 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
         id: z.number().describe('The ID of the recipient in the template.'),
         email: ZRecipientEmailSchema,
         name: z.string().max(255).optional(),
+        phone: z.string().max(20).optional(),
       }),
     )
     .describe('The information of the recipients to create the document with.'),

@@ -47,6 +47,12 @@ declare namespace NodeJS {
     NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH?: string;
     NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS?: string;
     NEXT_PRIVATE_SIGNING_LOCAL_FILE_ENCODING?: string;
+    /**
+     * Placeholder size in bytes reserved for the embedded CMS signature
+     * (certificate + chain + signature value). Defaults to libpdf's 12288.
+     * Certificates with long chains (e.g. ICP-Brasil) may need more.
+     */
+    NEXT_PRIVATE_SIGNING_ESTIMATED_SIZE?: string;
     NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH?: string;
     NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH?: string;
     NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS?: string;
