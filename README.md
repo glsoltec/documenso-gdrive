@@ -42,6 +42,56 @@ Fork do [Documenso](https://github.com/documenso/documenso) com customizações 
 - **Carregamento**: Certificado de assinatura via `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` (base64) ou `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`
 - **Correção de placeholder**: O libpdf reserva por padrão **12.288 bytes** no `/Contents` da assinatura — insuficiente para certificados ICP-Brasil (chain de 4 certs). Agora `NEXT_PRIVATE_SIGNING_ESTIMATED_SIZE` (ex.: `32768`) é lido e passado a `pdf.sign()`, evitando o erro `PlaceholderError` em certificados com chain grande
 
+### 8. Validação de CPF na Assinatura
+- **Algoritmo**: Validação do dígito verificador (módulo 11) no momento da conclusão da assinatura
+- **Auditoria**: CPF mascarado (`***.247.**`) registrado no `DocumentAuditLog` como evidência de rastreabilidade
+- **Opcional**: Ativado por padrão; tornar obrigatório com `NEXT_PUBLIC_REQUIRE_CPF_SIGNING="true"`
+- Implementado em `packages/lib/utils/validate-cpf.ts`
+
+### 9. Consentimento LGPD para WhatsApp
+- **Modelo Contact**: Campos `whatsappOptIn`, `whatsappOptInAt`, `whatsappOptInSource` — consentimento explícito do titular (LGPD art. 7, I)
+- **UI**: Checkbox "Opt-in WhatsApp" no formulário de criar/editar contato; badge verde "Consented" na listagem
+- **Envio**: Notificações automáticas (documento enviado/concluído) só disparam para contatos com opt-in ativo
+- **Logs**: Número de telefone mascarado nos logs (`55****984`)
+- Botão WhatsApp desabilitado para contatos sem consentimento
+
+## Segurança e LGPD
+
+### Criptografia
+- **Em trânsito**: TLS 1.2+ via Traefik (Let's Encrypt)
+- **Em repouso**: Documentos cifrados com XChaCha20-Poly1305 (`enc:v1:`); ativado via `NEXT_PRIVATE_DOCUMENT_ENCRYPTION_ENABLED`
+- **Chaves**: Validação forte em boot — rejeita `CAFEBABE`/`DEADBEEF`/valores default (LGPD art. 46)
+- **Token de assinatura**: Redigido em payloads de webhook externo por default (protegido via `NEXT_PRIVATE_WEBHOOK_INCLUDE_RECIPIENT_TOKEN`)
+
+### Proteção de Sessão e CSRF
+- **Sessão**: Cookie `httpOnly` + `secure` + `signed` + `SameSite=Lax` (produção)
+- **CSRF**: Sincronizador token em login, signout, 2FA, update-password, delete-account — validado contra cookie assinado
+- **Origin check**: Middleware global no Hono rejeita requests cross-origin
+
+### Rate Limit e Anti-Spoofing
+- **IP confiável**: `getIpAddress` só aceita headers `X-Forwarded-For` de proxy confiável (`NEXT_PRIVATE_TRUSTED_PROXY_IPS`)
+- **Rate limit**: Database-backed (Redis/BullMQ) para API v1/v2, tRPC, upload de arquivos, login
+- **Brute force**: Tentativas de login limitadas por IP + email
+
+### Headers de Segurança
+- `Content-Security-Policy`: nonce-based `script-src`, `style-src-elem`, `frame-ancestors` contextual (embeds liberam `*`, default `'self'`)
+- `Strict-Transport-Security`: `max-age=31536000; includeSubDomains`
+- `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`
+
+### Proteção contra SSRF
+- **Webhook URL**: `assertNotPrivateUrl` — bloqueia IPs privados/loopback + DNS lookup com timeout
+- **Evolution API**: URL estática configurada pelo administrador (não exposta a input de usuário)
+
+### Right-to-be-Forgotten (LGPD art. 18)
+- **Purga automática**: Job cron diário (03:00 UTC) remove envelopes com `deletedAt > 90 dias`
+- **Anonimização**: `delete-user` sobrescreve email → `deleted@...` e nome → `Deleted User` antes do hard-delete
+- **Auditoria**: Relatório completo em `docs/auditoria-lgpd.md`
+
+### Backup
+- **Script**: `scripts/backup.sh` — pg_dump com compressão gzip + rotação de 30 dias
+- **Agendamento**: `crontab -e` → `0 2 * * * /opt/documenso/scripts/backup.sh`
+- **Credenciais**: Lidas do `.env` do docker-compose automaticamente
+
 ## Infraestrutura
 
 - **Domínio**: `docsign.glsoltec.com.br`
@@ -78,6 +128,18 @@ NEXT_PRIVATE_SIGNING_PASSPHRASE=
 NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
 # Tamanho do placeholder da assinatura em bytes (certificados ICP-Brasil precisam de mais que o padrão 12288)
 NEXT_PRIVATE_SIGNING_ESTIMATED_SIZE=32768
+
+# Criptografia de documentos em repouso (LGPD art. 46)
+NEXT_PRIVATE_DOCUMENT_ENCRYPTION_ENABLED="true"
+
+# Proxy reverso confiavel para headers de IP (rate-limit anti-spoof)
+NEXT_PRIVATE_TRUSTED_PROXY_IPS=172.18.0.0/16
+
+# Incluir token do signatario em webhooks (redigido por default)
+# NEXT_PRIVATE_WEBHOOK_INCLUDE_RECIPIENT_TOKEN="false"
+
+# Tornar CPF obrigatorio na assinatura (default: opcional)
+# NEXT_PUBLIC_REQUIRE_CPF_SIGNING="false"
 ```
 
 ## Changelog

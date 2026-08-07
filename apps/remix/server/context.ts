@@ -19,7 +19,7 @@ export const appContext = async (c: Context, next: Next) => {
   const noSessionCookie = extractSessionCookieFromHeaders(request.headers) === null;
 
   setAppContext(c, {
-    requestMetadata: extractRequestMetadata(request),
+    requestMetadata: extractRequestMetadata(request, c),
   });
 
   // These are non page paths like API.

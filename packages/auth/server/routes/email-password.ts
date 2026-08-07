@@ -47,6 +47,7 @@ import { invalidateSessions } from '../lib/session/session';
 import { getCsrfCookie } from '../lib/session/session-cookies';
 import { onAuthorize } from '../lib/utils/authorizer';
 import { getSession } from '../lib/utils/get-session';
+import { requireCsrfToken } from '../lib/utils/require-csrf-token';
 import type { HonoAuthContext } from '../types/context';
 import {
   ZForgotPasswordSchema,
@@ -247,7 +248,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   /**
    * Update password endpoint.
    */
-  .post('/update-password', sValidator('json', ZUpdatePasswordSchema), async (c) => {
+  .post('/update-password', requireCsrfToken(), sValidator('json', ZUpdatePasswordSchema), async (c) => {
     const { password, currentPassword } = c.req.valid('json');
     const requestMetadata = c.get('requestMetadata');
 

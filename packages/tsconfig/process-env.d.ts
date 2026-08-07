@@ -113,6 +113,27 @@ declare namespace NodeJS {
     NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS?: string;
 
     /**
+     * At-rest document encryption (LGPD art. 46). See
+     * `packages/lib/universal/upload/document-encryption.ts`.
+     */
+    NEXT_PRIVATE_DOCUMENT_ENCRYPTION_ENABLED?: string;
+
+    /**
+     * Include recipient signing tokens in webhook payloads. Redacted by default.
+     */
+    NEXT_PRIVATE_WEBHOOK_INCLUDE_RECIPIENT_TOKEN?: string;
+
+    /**
+     * Comma-separated trusted proxy IPs/CIDRs allowed to set forwarding headers.
+     */
+    NEXT_PRIVATE_TRUSTED_PROXY_IPS?: string;
+
+    /**
+     * Require CPF validation before completing a document signing. Default false.
+     */
+    NEXT_PUBLIC_REQUIRE_CPF_SIGNING?: string;
+
+    /**
      * Redis / BullMQ environment variables
      */
     NEXT_PRIVATE_REDIS_URL?: string;

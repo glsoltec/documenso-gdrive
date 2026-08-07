@@ -22,6 +22,12 @@ export const sendContactMessage = async ({ teamId, contactId }: SendContactMessa
     });
   }
 
+  if (!contact.whatsappOptIn) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Contact has not consented to WhatsApp messages (LGPD art. 7, I).',
+    });
+  }
+
   if (!contact.phone) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Contact has no phone number.',

@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { invalidateSessions, validateSessionToken } from '../lib/session/session';
 import { deleteSessionCookie, getSessionCookie } from '../lib/session/session-cookies';
+import { requireCsrfToken } from '../lib/utils/require-csrf-token';
 import type { HonoAuthContext } from '../types/context';
 
 const ZSignoutSessionSchema = z.object({
@@ -12,7 +13,7 @@ const ZSignoutSessionSchema = z.object({
 });
 
 export const signOutRoute = new Hono<HonoAuthContext>()
-  .post('/signout', async (c) => {
+  .post('/signout', requireCsrfToken(), async (c) => {
     const metadata = c.get('requestMetadata');
 
     const sessionToken = await getSessionCookie(c);
@@ -39,7 +40,7 @@ export const signOutRoute = new Hono<HonoAuthContext>()
 
     return c.status(200);
   })
-  .post('/signout-all', async (c) => {
+  .post('/signout-all', requireCsrfToken(), async (c) => {
     const metadata = c.get('requestMetadata');
 
     const sessionToken = await getSessionCookie(c);
@@ -80,7 +81,7 @@ export const signOutRoute = new Hono<HonoAuthContext>()
 
     return c.status(200);
   })
-  .post('/signout-session', sValidator('json', ZSignoutSessionSchema), async (c) => {
+  .post('/signout-session', requireCsrfToken(), sValidator('json', ZSignoutSessionSchema), async (c) => {
     const metadata = c.get('requestMetadata');
 
     const { sessionId: sessionIdToRevoke } = c.req.valid('json');

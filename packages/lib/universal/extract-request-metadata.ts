@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import type { Context } from 'hono';
+
 import { getIpAddress } from './get-ip-address';
 
 const ZIpSchema = z.string().ip();
@@ -41,11 +43,11 @@ export type ApiRequestMetadata = {
   };
 };
 
-export const extractRequestMetadata = (req: Request): RequestMetadata => {
+export const extractRequestMetadata = (req: Request, c?: Context): RequestMetadata => {
   let ip: string | undefined;
 
   try {
-    ip = getIpAddress(req);
+    ip = getIpAddress(req, c);
   } catch {
     // Do nothing.
   }

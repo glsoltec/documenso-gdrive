@@ -26,6 +26,7 @@ import { EXECUTE_WEBHOOK_JOB_DEFINITION } from './definitions/internal/execute-w
 import { EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION } from './definitions/internal/expire-recipients-sweep';
 import { PROCESS_RECIPIENT_EXPIRED_JOB_DEFINITION } from './definitions/internal/process-recipient-expired';
 import { PROCESS_SIGNING_REMINDER_JOB_DEFINITION } from './definitions/internal/process-signing-reminder';
+import { PURGE_DELETED_DOCUMENTS_JOB_DEFINITION } from './definitions/internal/purge-deleted-documents';
 import { SEAL_DOCUMENT_JOB_DEFINITION } from './definitions/internal/seal-document';
 import { SEAL_DOCUMENT_SWEEP_JOB_DEFINITION } from './definitions/internal/seal-document-sweep';
 import { SEND_SIGNING_REMINDERS_SWEEP_JOB_DEFINITION } from './definitions/internal/send-signing-reminders-sweep';
@@ -64,6 +65,7 @@ export const jobsClient = new JobClient([
   SEND_SIGNING_REMINDERS_SWEEP_JOB_DEFINITION,
   PROCESS_SIGNING_REMINDER_JOB_DEFINITION,
   CLEANUP_RATE_LIMITS_JOB_DEFINITION,
+  PURGE_DELETED_DOCUMENTS_JOB_DEFINITION,
   SYNC_EMAIL_DOMAINS_JOB_DEFINITION,
   ADMIN_DELETE_ORGANISATION_JOB_DEFINITION,
   ALERT_ORGANISATION_SEAT_DRIFT_JOB_DEFINITION,

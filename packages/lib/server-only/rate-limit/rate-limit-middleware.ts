@@ -28,7 +28,7 @@ export const createRateLimitMiddleware = (
     let ip: string;
 
     try {
-      ip = getIpAddress(c.req.raw);
+      ip = getIpAddress(c.req.raw, c);
     } catch {
       ip = 'unknown';
     }

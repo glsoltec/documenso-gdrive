@@ -36,7 +36,7 @@ export const contactRouter = router({
     .output(ZCreateContactResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
-      const { email, name, phone } = input;
+      const { email, name, phone, whatsappOptIn, whatsappOptInSource } = input;
 
       return await createContact({
         userId: user.id,
@@ -44,6 +44,8 @@ export const contactRouter = router({
         email,
         name,
         phone,
+        whatsappOptIn,
+        whatsappOptInSource,
       });
     }),
 

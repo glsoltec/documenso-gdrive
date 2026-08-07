@@ -166,6 +166,11 @@ export const securityHeadersMiddleware = createMiddleware<HonoEnv>(async (c, nex
 
   c.res.headers.set('Content-Security-Policy', buildCspHeader({ nonce, kind }));
 
+  // HSTS: enforce HTTPS for 1 year (LGPD art. 46 — encryption in transit).
+  if (!c.res.headers.has('Strict-Transport-Security')) {
+    c.res.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+
   // Preserved from the per-route `headers()` export in
   // apps/remix/app/routes/embed+/_v0+/_layout.tsx, which has been removed.
   if (kind === 'embed') {

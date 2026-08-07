@@ -14,7 +14,18 @@ import {
 } from '@prisma/client';
 import { z } from 'zod';
 
+import { env } from '../utils/env';
 import { mapSecondaryIdToDocumentId, mapSecondaryIdToTemplateId } from '../utils/envelope';
+
+/**
+ * Whether recipient signing tokens are included in outgoing webhook payloads.
+ *
+ * The recipient token is a bearer credential that authorizes reading and
+ * signing a document (`/sign/:token`). It is redacted by default to avoid
+ * exposing it to arbitrary webhook receivers (LGPD art. 46-49; OWASP). Set to
+ * `true` only when a consumer explicitly requires it.
+ */
+const isWebhookRecipientTokenEnabled = () => env('NEXT_PRIVATE_WEBHOOK_INCLUDE_RECIPIENT_TOKEN') === 'true';
 
 /**
  * Schema for recipient data in webhook payloads.
@@ -26,7 +37,7 @@ export const ZWebhookRecipientSchema = z.object({
   templateId: z.number().nullable(),
   email: z.string(),
   name: z.string(),
-  token: z.string(),
+  token: z.string().nullable(),
   documentDeletedAt: z.coerce.date().nullable(),
   expiresAt: z.coerce.date().nullable(),
   expirationNotifiedAt: z.coerce.date().nullable(),
@@ -124,7 +135,7 @@ export const mapEnvelopeToWebhookDocumentPayload = (
     templateId: envelope.type === EnvelopeType.TEMPLATE ? legacyId : null,
     email: recipient.email,
     name: recipient.name,
-    token: recipient.token,
+    token: isWebhookRecipientTokenEnabled() ? recipient.token : null,
     documentDeletedAt: recipient.documentDeletedAt,
     expiresAt: recipient.expiresAt,
     expirationNotifiedAt: recipient.expirationNotifiedAt,

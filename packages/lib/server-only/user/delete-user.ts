@@ -1,5 +1,6 @@
 import { prisma } from '@documenso/prisma';
 
+import { deletedServiceAccountEmail } from './service-accounts/deleted-account';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import { deleteOrganisation } from '../organisation/delete-organisation';
@@ -89,6 +90,20 @@ export const deleteUser = async ({ id }: DeleteUserOptions) => {
       });
     }),
   );
+
+  // Anonymise PII before hard-deleting the user row so that any surviving
+  // references (e.g. DocumentAuditLog) do not retain the original email/name
+  // (LGPD art. 18, IV — right to anonymisation / erasure).
+  const deletedEmail = deletedServiceAccountEmail();
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      email: deletedEmail,
+      name: 'Deleted User',
+      signature: null,
+    },
+  });
 
   const deletedUser = await prisma.user.delete({
     where: {

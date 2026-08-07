@@ -30,11 +30,13 @@ import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendRecipientSigned, sendDocumentCompleted } from '../whatsapp/send-whatsapp';
 import { isRecipientAuthorized } from './is-recipient-authorized';
+import { maskCPF, validateCPF } from '../../utils/validate-cpf';
 
 export type CompleteDocumentWithTokenOptions = {
   token: string;
   id: EnvelopeIdOptions;
   userId?: number;
+  cpf?: string;
   accessAuthOptions?: TRecipientAccessAuth;
   requestMetadata?: RequestMetadata;
   nextSigner?: {
@@ -55,6 +57,7 @@ export const completeDocumentWithToken = async ({
   token,
   id,
   userId,
+  cpf,
   accessAuthOptions,
   requestMetadata,
   nextSigner,
@@ -358,7 +361,27 @@ export const completeDocumentWithToken = async ({
     teamId: envelope.teamId,
   });
 
-  await sendRecipientSigned(envelope.title, recipientEmail, recipientName);
+  if (cpf && validateCPF(cpf)) {
+    await prisma.documentAuditLog.create({
+      data: {
+        envelopeId: envelope.id,
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CPF_VALIDATED,
+        email: recipientEmail,
+        name: recipientName,
+        userId: null,
+        userAgent: requestMetadata?.userAgent ?? null,
+        ipAddress: requestMetadata?.ipAddress ?? null,
+        data: {
+          recipientEmail,
+          recipientName,
+          recipientId: recipient.id,
+          cpfMasked: maskCPF(cpf),
+        },
+      },
+    });
+  }
+
+  await sendRecipientSigned(envelope.title, recipientEmail, recipientName, envelope.teamId);
 
   await jobs.triggerJob({
     name: 'send.recipient.signed.email',
@@ -506,5 +529,6 @@ export const completeDocumentWithToken = async ({
     updatedDocument.recipients
       .filter((r) => r.role !== RecipientRole.CC)
       .map((r) => ({ email: r.email, name: r.name })),
+    updatedDocument.teamId,
   );
 };

@@ -7,9 +7,19 @@ export interface CreateContactOptions {
   email: string;
   name: string;
   phone?: string | null;
+  whatsappOptIn?: boolean;
+  whatsappOptInSource?: string | null;
 }
 
-export const createContact = async ({ userId, teamId, email, name, phone }: CreateContactOptions) => {
+export const createContact = async ({
+  userId,
+  teamId,
+  email,
+  name,
+  phone,
+  whatsappOptIn = false,
+  whatsappOptInSource = null,
+}: CreateContactOptions) => {
   const existing = await prisma.contact.findUnique({
     where: {
       teamId_email: { teamId, email },
@@ -28,6 +38,9 @@ export const createContact = async ({ userId, teamId, email, name, phone }: Crea
       name,
       phone,
       teamId,
+      whatsappOptIn,
+      whatsappOptInAt: whatsappOptIn ? new Date() : null,
+      whatsappOptInSource,
     },
   });
 };

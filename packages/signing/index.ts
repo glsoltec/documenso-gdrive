@@ -1,5 +1,6 @@
 import {
   NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER,
+  NEXT_PRIVATE_SIGNING_ESTIMATED_SIZE,
   NEXT_PUBLIC_SIGNING_CONTACT_INFO,
   NEXT_PUBLIC_WEBAPP_URL,
 } from '@documenso/lib/constants/app';
@@ -46,6 +47,7 @@ export const signPdf = async ({ pdf }: SignOptions) => {
     location: NEXT_PUBLIC_WEBAPP_URL(),
     contactInfo: NEXT_PUBLIC_SIGNING_CONTACT_INFO(),
     subFilter: NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER() ? 'adbe.pkcs7.detached' : 'ETSI.CAdES.detached',
+    estimatedSize: NEXT_PRIVATE_SIGNING_ESTIMATED_SIZE(),
     timestampAuthority: tsa ?? undefined,
     longTermValidation: !!tsa,
     archivalTimestamp: !!tsa,

@@ -9,13 +9,15 @@ import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { useLingui } from '@lingui/react/macro';
 import { FieldType } from '@prisma/client';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useRevalidator, useSearchParams } from 'react-router';
 
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 
 import { DocumentSigningCompleteDialog } from '../document-signing/document-signing-complete-dialog';
 import { useRequiredEnvelopeSigningContext } from '../document-signing/envelope-signing-provider';
+import { validateCPF } from '@documenso/lib/utils/validate-cpf';
+import { Input } from '@documenso/ui/primitives/input';
 
 export const EnvelopeSignerCompleteDialog = () => {
   const navigate = useNavigate();
@@ -26,6 +28,8 @@ export const EnvelopeSignerCompleteDialog = () => {
   const { revalidate } = useRevalidator();
 
   const [searchParams] = useSearchParams();
+  const [cpf, setCpf] = useState('');
+  const [cpfError, setCpfError] = useState<string | null>(null);
 
   const {
     isDirectTemplate,
@@ -92,6 +96,7 @@ export const EnvelopeSignerCompleteDialog = () => {
       const result = await completeDocument({
         token: recipient.token,
         documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
+        cpf: cpf || undefined,
         accessAuthOptions,
         recipientOverride: recipientDetails,
         ...(nextSigner?.email && nextSigner?.name ? { nextSigner } : {}),
@@ -245,19 +250,45 @@ export const EnvelopeSignerCompleteDialog = () => {
   }, [email, fullName, isDirectTemplate, recipient.email, recipient.name, recipient.fields]);
 
   return (
-    <DocumentSigningCompleteDialog
-      isSubmitting={isPending}
-      recipientPayload={recipientPayload}
-      onSignatureComplete={isDirectTemplate ? handleDirectTemplateCompleteClick : handleOnCompleteClick}
-      documentTitle={envelope.title}
-      fields={recipientFieldsRemaining}
-      fieldsValidated={handleOnNextFieldClick}
-      recipient={recipient}
-      allowDictateNextSigner={Boolean(nextRecipient && envelope.documentMeta.allowDictateNextSigner)}
-      disableNameInput={!isDirectTemplate && recipient.name !== ''}
-      defaultNextSigner={nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined}
-      buttonSize="sm"
-      position="center"
-    />
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-2">
+        <Input
+          value={cpf}
+          onChange={(e) => {
+            const raw = e.target.value.replace(/\D/g, '').slice(0, 11);
+            setCpf(raw);
+            if (raw.length === 11) {
+              if (!validateCPF(raw)) {
+                setCpfError(t`Invalid CPF`);
+              } else {
+                setCpfError(null);
+              }
+            } else {
+              setCpfError(null);
+            }
+          }}
+          placeholder={t`CPF (optional)`}
+          className={`h-8 w-[140px] text-sm ${cpfError ? 'border-destructive' : ''}`}
+          maxLength={11}
+        />
+        {cpfError && (
+          <span className="text-destructive text-xs">{cpfError}</span>
+        )}
+      </div>
+      <DocumentSigningCompleteDialog
+        isSubmitting={isPending}
+        recipientPayload={recipientPayload}
+        onSignatureComplete={isDirectTemplate ? handleDirectTemplateCompleteClick : handleOnCompleteClick}
+        documentTitle={envelope.title}
+        fields={recipientFieldsRemaining}
+        fieldsValidated={handleOnNextFieldClick}
+        recipient={recipient}
+        allowDictateNextSigner={Boolean(nextRecipient && envelope.documentMeta.allowDictateNextSigner)}
+        disableNameInput={!isDirectTemplate && recipient.name !== ''}
+        defaultNextSigner={nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined}
+        buttonSize="sm"
+        position="center"
+      />
+    </div>
   );
 };

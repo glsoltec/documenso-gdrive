@@ -1285,6 +1285,11 @@ model Contact {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  /// Consentimento LGPD para envio de mensagens via WhatsApp (art. 7º, I)
+  whatsappOptIn      Boolean?  @default(false)
+  whatsappOptInAt    DateTime?
+  whatsappOptInSource String? @db.VarChar(255)
+
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@unique([teamId, email])

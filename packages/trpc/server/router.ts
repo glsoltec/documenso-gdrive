@@ -1,6 +1,7 @@
 import { adminRouter } from './admin-router/router';
 import { apiTokenRouter } from './api-token-router/router';
 import { authRouter } from './auth-router/router';
+import { contactRouter } from './contact-router/router';
 import { documentRouter } from './document-router/router';
 import { embeddingPresignRouter } from './embedding-router/_router';
 import { enterpriseRouter } from './enterprise-router/router';
@@ -16,6 +17,7 @@ import { router } from './trpc';
 import { webhookRouter } from './webhook-router/router';
 
 export const appRouter = router({
+  contact: contactRouter,
   enterprise: enterpriseRouter,
   envelope: envelopeRouter,
   auth: authRouter,

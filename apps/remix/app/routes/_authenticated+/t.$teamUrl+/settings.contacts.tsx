@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@docu
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@documenso/ui/primitives/table';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
+import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { useState, useCallback } from 'react';
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -42,13 +43,14 @@ function ContactForm({
   onSave,
   onCancel,
 }: {
-  initial: { name: string; email: string; phone: string };
-  onSave: (data: { name: string; email: string; phone: string }) => void;
+  initial: { name: string; email: string; phone: string; whatsappOptIn: boolean };
+  onSave: (data: { name: string; email: string; phone: string; whatsappOptIn: boolean }) => void;
   onCancel: () => void;
 }) {
   const [name, setName] = useState(initial.name);
   const [email, setEmail] = useState(initial.email);
   const [phone, setPhone] = useState(initial.phone);
+  const [whatsappOptIn, setWhatsappOptIn] = useState(initial.whatsappOptIn);
 
   return (
     <div className="flex items-end gap-2">
@@ -61,8 +63,12 @@ function ContactForm({
       <div className="w-[140px]">
         <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone" className="h-8" maxLength={20} />
       </div>
+      <label className="flex items-center gap-1 whitespace-nowrap text-xs text-muted-foreground">
+        <Checkbox checked={whatsappOptIn} onCheckedChange={(v) => setWhatsappOptIn(Boolean(v))} />
+        <Trans>Opt-in WhatsApp</Trans>
+      </label>
       <div className="flex gap-2">
-        <Button size="sm" onClick={() => onSave({ name, email, phone })}>
+        <Button size="sm" onClick={() => onSave({ name, email, phone, whatsappOptIn })}>
           <Trans>Save</Trans>
         </Button>
         <Button size="sm" variant="secondary" onClick={onCancel}>
@@ -101,13 +107,15 @@ export default function ContactsPage(_props: Route.ComponentProps) {
   }, [utils]);
 
   const handleSave = useCallback(
-    async (id: number, data: { name: string; email: string; phone: string }) => {
+    async (id: number, data: { name: string; email: string; phone: string; whatsappOptIn: boolean }) => {
       try {
         await updateContact({
           id,
           name: data.name,
           email: data.email,
           phone: data.phone || null,
+          whatsappOptIn: data.whatsappOptIn,
+          whatsappOptInSource: data.whatsappOptIn ? 'manual' : null,
         });
 
         setEditing((prev) => ({ ...prev, [id]: false }));
@@ -116,7 +124,7 @@ export default function ContactsPage(_props: Route.ComponentProps) {
         toast({ title: _(msg`Failed to update contact`), variant: 'destructive' });
       }
     },
-    [updateContact],
+    [updateContact, _],
   );
 
   const handleDelete = useCallback(
@@ -129,7 +137,7 @@ export default function ContactsPage(_props: Route.ComponentProps) {
         toast({ title: _(msg`Failed to delete contact`), variant: 'destructive' });
       }
     },
-    [deleteContact, refresh],
+    [deleteContact, refresh, _],
   );
 
   const handleSendMessage = useCallback(
@@ -141,16 +149,18 @@ export default function ContactsPage(_props: Route.ComponentProps) {
         toast({ title: _(msg`Failed to send message`), variant: 'destructive' });
       }
     },
-    [sendMessage],
+    [sendMessage, _],
   );
 
   const handleAdd = useCallback(
-    async (data: { name: string; email: string; phone: string }) => {
+    async (data: { name: string; email: string; phone: string; whatsappOptIn: boolean }) => {
       try {
         await createContact({
           name: data.name,
           email: data.email,
           phone: data.phone || null,
+          whatsappOptIn: data.whatsappOptIn,
+          whatsappOptInSource: data.whatsappOptIn ? 'manual' : null,
         });
 
         setShowAdd(false);
@@ -160,7 +170,7 @@ export default function ContactsPage(_props: Route.ComponentProps) {
         toast({ title: _(msg`Failed to create contact`), variant: 'destructive' });
       }
     },
-    [createContact, refresh],
+    [createContact, refresh, _],
   );
 
   return (
@@ -191,7 +201,7 @@ export default function ContactsPage(_props: Route.ComponentProps) {
             <div className="mb-4 rounded-lg border p-3">
               <p className="mb-2 text-sm font-medium"><Trans>New Contact</Trans></p>
               <ContactForm
-                initial={{ name: '', email: '', phone: '' }}
+                initial={{ name: '', email: '', phone: '', whatsappOptIn: false }}
                 onSave={handleAdd}
                 onCancel={() => setShowAdd(false)}
               />
@@ -215,6 +225,7 @@ export default function ContactsPage(_props: Route.ComponentProps) {
                   <TableHead><Trans>Name</Trans></TableHead>
                   <TableHead><Trans>Email</Trans></TableHead>
                   <TableHead><Trans>Phone</Trans></TableHead>
+                  <TableHead><Trans>WhatsApp</Trans></TableHead>
                   <TableHead><Trans>Actions</Trans></TableHead>
                 </TableRow>
               </TableHeader>
@@ -222,9 +233,9 @@ export default function ContactsPage(_props: Route.ComponentProps) {
                 {contacts.map((c) =>
                   editing[c.id] ? (
                     <TableRow key={c.id}>
-                      <TableCell colSpan={4}>
+                      <TableCell colSpan={5}>
                         <ContactForm
-                          initial={{ name: c.name, email: c.email, phone: c.phone ?? '' }}
+                          initial={{ name: c.name, email: c.email, phone: c.phone ?? '', whatsappOptIn: !!c.whatsappOptIn }}
                           onSave={(data) => handleSave(c.id, data)}
                           onCancel={() => handleCancel(c.id)}
                         />
@@ -236,11 +247,21 @@ export default function ContactsPage(_props: Route.ComponentProps) {
                       <TableCell>{c.email}</TableCell>
                       <TableCell>{c.phone ?? <span className="text-muted-foreground italic">—</span>}</TableCell>
                       <TableCell>
+                        {c.whatsappOptIn ? (
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600">
+                            <span className="block h-1.5 w-1.5 rounded-full bg-green-600" />
+                            <Trans>Consented</Trans>
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground text-xs italic">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
                         <div className="flex gap-2">
                           <Button
                             size="sm"
                             variant="outline"
-                            disabled={!c.phone || isSendingMessage}
+                            disabled={!c.phone || isSendingMessage || !c.whatsappOptIn}
                             onClick={() => handleSendMessage(c.id)}
                           >
                             <Trans>WhatsApp</Trans>

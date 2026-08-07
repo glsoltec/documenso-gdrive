@@ -3,8 +3,10 @@ import superjson from 'superjson';
 
 import { deleteAccountProvider } from '../lib/utils/delete-account-provider';
 import { getAccounts } from '../lib/utils/get-accounts';
+import { requireCsrfToken } from '../lib/utils/require-csrf-token';
+import type { HonoAuthContext } from '../types/context';
 
-export const accountRoute = new Hono()
+export const accountRoute = new Hono<HonoAuthContext>()
   /**
    * Get all linked accounts.
    */
@@ -16,7 +18,7 @@ export const accountRoute = new Hono()
   /**
    * Delete an account linking method.
    */
-  .delete('/account/:accountId', async (c) => {
+  .delete('/account/:accountId', requireCsrfToken(), async (c) => {
     const accountId = c.req.param('accountId');
 
     await deleteAccountProvider(c, accountId);

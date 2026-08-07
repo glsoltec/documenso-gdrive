@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
 import { getSession } from '../lib/utils/get-session';
+import { requireCsrfToken } from '../lib/utils/require-csrf-token';
 import type { HonoAuthContext } from '../types/context';
 import {
   ZDisableTwoFactorRequestSchema,
@@ -20,7 +21,7 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
   /**
    * Setup two factor authentication.
    */
-  .post('/setup', async (c) => {
+  .post('/setup', requireCsrfToken(), async (c) => {
     const { user } = await getSession(c);
 
     const result = await setupTwoFactorAuthentication({
@@ -37,7 +38,7 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
   /**
    * Enable two factor authentication.
    */
-  .post('/enable', sValidator('json', ZEnableTwoFactorRequestSchema), async (c) => {
+  .post('/enable', requireCsrfToken(), sValidator('json', ZEnableTwoFactorRequestSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
     const { user: sessionUser } = await getSession(c);
@@ -75,7 +76,7 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
   /**
    * Disable two factor authentication.
    */
-  .post('/disable', sValidator('json', ZDisableTwoFactorRequestSchema), async (c) => {
+  .post('/disable', requireCsrfToken(), sValidator('json', ZDisableTwoFactorRequestSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
     const { user: sessionUser } = await getSession(c);
@@ -112,7 +113,7 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
   /**
    * View backup codes.
    */
-  .post('/view-recovery-codes', sValidator('json', ZViewTwoFactorRecoveryCodesRequestSchema), async (c) => {
+  .post('/view-recovery-codes', requireCsrfToken(), sValidator('json', ZViewTwoFactorRecoveryCodesRequestSchema), async (c) => {
     const { user: sessionUser } = await getSession(c);
 
     const user = await prisma.user.findFirst({

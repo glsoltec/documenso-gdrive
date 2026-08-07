@@ -165,6 +165,13 @@ export const ZSetTemplateRecipientsResponseSchema = z.object({
 export const ZCompleteDocumentWithTokenMutationSchema = z.object({
   token: z.string(),
   documentId: z.number(),
+  cpf: z
+    .string()
+    .transform((v) => v.replace(/\D/g, ''))
+    .refine((v) => v.length === 0 || v.length === 11, {
+      message: 'CPF must be 11 digits',
+    })
+    .optional(),
   accessAuthOptions: ZRecipientAccessAuthSchema.optional(),
   nextSigner: z
     .object({

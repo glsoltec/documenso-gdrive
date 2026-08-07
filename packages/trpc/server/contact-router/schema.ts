@@ -9,6 +9,9 @@ export const ZContactSchema = z.object({
   teamId: z.number(),
   createdAt: z.date(),
   updatedAt: z.date(),
+  whatsappOptIn: z.boolean().nullable(),
+  whatsappOptInAt: z.date().nullable(),
+  whatsappOptInSource: z.string().nullable(),
 });
 
 export const ZFindContactsResponseSchema = z.object({
@@ -19,6 +22,8 @@ export const ZCreateContactRequestSchema = z.object({
   email: zEmail().toLowerCase().max(254),
   name: z.string().max(255),
   phone: z.string().max(20).nullable().optional(),
+  whatsappOptIn: z.boolean().optional(),
+  whatsappOptInSource: z.string().max(255).nullable().optional(),
 });
 
 export const ZCreateContactResponseSchema = ZContactSchema;
@@ -28,6 +33,8 @@ export const ZUpdateContactRequestSchema = z.object({
   email: zEmail().toLowerCase().max(254).optional(),
   name: z.string().max(255).optional(),
   phone: z.string().max(20).nullable().optional(),
+  whatsappOptIn: z.boolean().optional(),
+  whatsappOptInSource: z.string().max(255).nullable().optional(),
 });
 
 export const ZUpdateContactResponseSchema = ZContactSchema;

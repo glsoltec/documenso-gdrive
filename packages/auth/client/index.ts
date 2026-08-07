@@ -42,20 +42,44 @@ export class AuthClient {
     this.client = hc<AuthAppType>(options.baseUrl);
   }
 
+  /**
+   * Fetch and memoize the CSRF token stored, then return it in a header form.
+   *
+   * Used by state-changing requests as defense-in-depth against CSRF.
+   */
+  private async csrfHeaders(): Promise<Record<string, string>> {
+    const { csrfToken } = await this.client.csrf.$get().then(async (res) => res.json());
+
+    if (!csrfToken) {
+      return {};
+    }
+
+    return { 'X-CSRF-Token': csrfToken };
+  }
+
   public async signOut({ redirectPath }: { redirectPath?: string } = {}) {
-    await this.client.signout.$post();
+    await this.client.signout.$post(
+      {},
+      { headers: await this.csrfHeaders() },
+    );
 
     window.location.href = redirectPath ?? this.signOutredirectPath;
   }
 
   public async signOutAllSessions() {
-    await this.client['signout-all'].$post();
+    await this.client['signout-all'].$post(
+      {},
+      { headers: await this.csrfHeaders() },
+    );
   }
 
   public async signOutSession({ sessionId, redirectPath }: { sessionId: string; redirectPath?: string }) {
-    await this.client['signout-session'].$post({
-      json: { sessionId },
-    });
+    await this.client['signout-session'].$post(
+      {
+        json: { sessionId },
+      },
+      { headers: await this.csrfHeaders() },
+    );
 
     if (redirectPath) {
       window.location.href = redirectPath;
@@ -115,9 +139,12 @@ export class AuthClient {
       return superjson.deserialize<{ accounts: PartialAccount[] }>(result);
     },
     delete: async (accountId: string) => {
-      const response = await this.client['account'][':accountId'].$delete({
-        param: { accountId },
-      });
+      const response = await this.client['account'][':accountId'].$delete(
+        {
+          param: { accountId },
+        },
+        { headers: await this.csrfHeaders() },
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -152,7 +179,10 @@ export class AuthClient {
     },
 
     updatePassword: async (data: TUpdatePasswordSchema) => {
-      const response = await this.client['email-password']['update-password'].$post({ json: data });
+      const response = await this.client['email-password']['update-password'].$post(
+        { json: data },
+        { headers: await this.csrfHeaders() },
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -218,7 +248,10 @@ export class AuthClient {
 
   public twoFactor = {
     setup: async () => {
-      const response = await this.client['two-factor'].setup.$post();
+      const response = await this.client['two-factor'].setup.$post(
+        {},
+        { headers: await this.csrfHeaders() },
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -229,7 +262,10 @@ export class AuthClient {
       return response.json();
     },
     enable: async (data: TEnableTwoFactorRequestSchema) => {
-      const response = await this.client['two-factor'].enable.$post({ json: data });
+      const response = await this.client['two-factor'].enable.$post(
+        { json: data },
+        { headers: await this.csrfHeaders() },
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -240,7 +276,10 @@ export class AuthClient {
       return response.json();
     },
     disable: async (data: TDisableTwoFactorRequestSchema) => {
-      const response = await this.client['two-factor'].disable.$post({ json: data });
+      const response = await this.client['two-factor'].disable.$post(
+        { json: data },
+        { headers: await this.csrfHeaders() },
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -249,7 +288,10 @@ export class AuthClient {
       }
     },
     viewRecoveryCodes: async (data: TViewTwoFactorRecoveryCodesRequestSchema) => {
-      const response = await this.client['two-factor']['view-recovery-codes'].$post({ json: data });
+      const response = await this.client['two-factor']['view-recovery-codes'].$post(
+        { json: data },
+        { headers: await this.csrfHeaders() },
+      );
 
       if (!response.ok) {
         const error = await response.json();

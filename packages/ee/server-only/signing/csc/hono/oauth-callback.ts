@@ -169,7 +169,7 @@ export const cscOAuthCallbackRoute = new Hono<HonoCscEnv>().get(
             type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_AUTHENTICATED,
             envelopeId: recipient.envelopeId,
             user: { name: recipient.name, email: recipient.email },
-            requestMetadata: extractRequestMetadata(c.req.raw),
+            requestMetadata: extractRequestMetadata(c.req.raw, c),
             data: {
               recipientEmail: recipient.email,
               recipientName: recipient.name,
@@ -201,7 +201,7 @@ export const cscOAuthCallbackRoute = new Hono<HonoCscEnv>().get(
               type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_AUTHENTICATION_FAILED,
               envelopeId: recipient.envelopeId,
               user: { name: recipient.name, email: recipient.email },
-              requestMetadata: extractRequestMetadata(c.req.raw),
+              requestMetadata: extractRequestMetadata(c.req.raw, c),
               data: {
                 recipientEmail: recipient.email,
                 recipientName: recipient.name,
@@ -278,7 +278,7 @@ export const cscOAuthCallbackRoute = new Hono<HonoCscEnv>().get(
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_AUTHORIZED,
         envelopeId: recipient.envelopeId,
         user: { name: recipient.name, email: recipient.email },
-        requestMetadata: extractRequestMetadata(c.req.raw),
+        requestMetadata: extractRequestMetadata(c.req.raw, c),
         data: {
           recipientEmail: recipient.email,
           recipientName: recipient.name,

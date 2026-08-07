@@ -374,6 +374,7 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     updatedEnvelope.recipients
       .filter((r) => r.role !== RecipientRole.CC)
       .map((r) => ({ email: r.email, name: r.name, token: r.token })),
+    updatedEnvelope.teamId,
   );
 
   await syncRecipientsToContacts({
